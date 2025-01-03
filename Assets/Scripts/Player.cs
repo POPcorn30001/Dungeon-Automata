@@ -1,0 +1,98 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine.InputSystem;
+using UnityEngine;
+using UnityEngine.UIElements;
+
+public class Player : MonoBehaviour
+{
+    private Vector2 moveInput = Vector2.zero;
+    private SpriteRenderer sr;
+    private PlayerInput playerInput;
+    private Rigidbody2D rb;
+    
+    [SerializeField] private StatsObject stats;
+    public float speed = 1;
+    public float range = 1;
+
+    [SerializeField] private GameObject attackPf;
+    [SerializeField] private Vector2 attackOffsetPoint;
+    private bool attacking = false;
+    private float attackEnd =0;
+    private float nextAttackTime;
+
+    private void Awake(){
+        rb = gameObject.GetComponent<Rigidbody2D>();
+        sr = gameObject.GetComponent<SpriteRenderer>();
+        playerInput = gameObject.GetComponent<PlayerInput>();
+
+        speed = stats.speed;
+        range = stats.range;
+    }
+    void Update()
+    {
+        if(!attacking){
+            MovePlayer(moveInput);
+        }
+        else{
+            rb.velocity = Vector2.zero;
+        }
+        if(Time.time > attackEnd) attacking = false;
+    }
+
+
+    public void OnMove(InputAction.CallbackContext ctx){
+        moveInput = ctx.ReadValue<Vector2>();
+        //Debug.Log(moveInput);
+    }
+
+    public void OnRightClick(InputAction.CallbackContext ctx){
+        if(attacking || nextAttackTime > Time.time) return;
+
+
+        attacking = true;
+        attackEnd = Time.time + stats.attackTime;
+        nextAttackTime = Time.time + stats.attackSpeed;
+        Vector3 spawnPos = gameObject.transform.position;
+
+        float flip;
+        if(gameObject.transform.localScale.x >= 0){
+            spawnPos.x += attackOffsetPoint.x;
+            spawnPos.y += attackOffsetPoint.y;
+            flip = 1;
+        }
+        else{
+            spawnPos.x -= attackOffsetPoint.x;
+            spawnPos.y += attackOffsetPoint.y;
+            flip = -1;
+        }
+        
+        GameObject attack = Instantiate(attackPf, spawnPos, Quaternion.identity);
+        attack.GetComponent<Attack>().Setup(Vector2.zero, GameManager.EntityClass.Player);
+        Vector3 scale = attack.transform.localScale;
+        scale.x *= flip;
+        attack.transform.localScale = scale;
+    }
+
+    private void MovePlayer(Vector2 dir){
+        Vector3 move = new Vector3(dir.x, dir.y, 0);
+        rb.velocity = move * speed;
+        
+        //sort layer
+        sr.sortingOrder = Mathf.RoundToInt(-transform.position.y * 100);
+
+        //flip player
+        if(rb.velocity.x == 0) return;
+        Vector3 scale = gameObject.transform.localScale;
+
+        if(rb.velocity.x > 0){ //move right
+            scale.x = Mathf.Abs(scale.x) * -1;
+        }
+        else if(rb.velocity.x < 0){
+            scale.x = Mathf.Abs(scale.x);
+        }
+        gameObject.transform.localScale = scale;
+
+
+    }
+}
