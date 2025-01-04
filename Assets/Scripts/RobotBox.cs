@@ -5,7 +5,15 @@ using UnityEngine.UI;
 
 public class RobotBox : MonoBehaviour
 {
-    
+    public enum Components{
+        Melee,
+        Shoot,
+        Move,
+        Explode,
+        Heal
+    }
+
+    private List<Components> parts = new List<Components>();
     [SerializeField] GameObject indicatorPanelPrefab;
     [SerializeField] GameObject tinkerPanelPrefab;
     private GameObject indicatorPanel;
@@ -38,6 +46,8 @@ public class RobotBox : MonoBehaviour
         //spawn UI
     }
 
+
+    
     // Update is called once per frame
     void Update()
     {
@@ -56,6 +66,11 @@ public class RobotBox : MonoBehaviour
         
         if(!hasComponents){ //tinker phase
             //TODO, skip
+
+
+
+
+
             hasComponents = true;
             indicator.ShowHold();
 
