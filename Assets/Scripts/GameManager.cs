@@ -1,12 +1,19 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
 
     bool GameRunning = true;
     public GameObject player;
+
+    private bool menuActive = false;
+    private bool settingsActive = false;
+    [SerializeField] private GameObject menuPanel;
+    [SerializeField] private GameObject settingsPanel;
     public enum EntityClass
     {
         Player,
@@ -34,13 +41,15 @@ public class GameManager : MonoBehaviour
         else
         { sInstance = this; }
 
-        playerEntities.Add(player);
+
+        menuPanel.SetActive(false);
+        settingsPanel.SetActive(false);
     }
 
     // Update is called once per frame
     void Update()
     {
-        
+        if(Input.GetKeyDown(KeyCode.Escape)) OnClickMenu();
     }
 
 
@@ -105,5 +114,44 @@ public class GameManager : MonoBehaviour
         if(targetList.Contains(target)){
             targetList.Remove(target);
         } 
+    }
+
+    public bool SpawnTurret(Vector3 pos){
+        if(menuActive) return false;
+        Instantiate(Resources.Load<GameObject>("Prefabs/Turret"), pos, Quaternion.identity);
+        return true;
+    }
+
+    public void OnClickMenu(){
+        if(menuActive){ //close menu
+            menuPanel.SetActive(false);
+            settingsPanel.SetActive(false);
+            
+            menuActive = false;
+            settingsActive = false;
+
+            Time.timeScale = 1f;
+            
+        }
+        else{ //open menu
+            menuPanel.SetActive(true);
+            
+            menuActive = true;
+
+            Time.timeScale = 0f;
+        }
+    }
+    public void OnCLickSettings(){
+        if(settingsActive){
+            settingsPanel.SetActive(false);
+            settingsActive = false;
+        }
+        else{
+            settingsPanel.SetActive(true);
+            settingsActive = true;
+        }
+    }
+    public void OnCLickStartingScreen(){
+        SceneManager.LoadScene(0);
     }
 }

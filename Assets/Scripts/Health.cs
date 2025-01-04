@@ -5,10 +5,12 @@ using UnityEngine;
 public class Health : MonoBehaviour
 {
     [SerializeField] private StatsObject stats;
+    [SerializeField] private PlayerPanel playerPanel; 
+    [SerializeField] private GameObject target; //what enemies are agroing
     public GameManager.EntityClass entityClass;
     public int health;
 
-    private bool isPlayer = false;
+    public bool isPlayer = false;
     
     
     void Awake()
@@ -18,6 +20,8 @@ public class Health : MonoBehaviour
             entityClass = stats.entityClass;
         } 
         else health = 20;
+
+        GameManager.Instance.AddEntityToList(target, entityClass);
     }
 
     // Update is called once per frame
@@ -29,7 +33,11 @@ public class Health : MonoBehaviour
     public void TakeDamage(int val){
 
         health -= val;
-        if(health <= 0) KillEntity();
+        if(health <= 0){
+            health = 0;
+            KillEntity();
+        } 
+        if(isPlayer && playerPanel) playerPanel.SetHealth(health);
     }
 
     void KillEntity(){
@@ -39,7 +47,7 @@ public class Health : MonoBehaviour
             GameManager.Instance.EndGame();
         }
 
-        GameManager.Instance.RemoveEntityFromList(gameObject, entityClass);
+        GameManager.Instance.RemoveEntityFromList(target, entityClass);
         Destroy(gameObject);
     }
 

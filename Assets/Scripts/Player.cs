@@ -7,14 +7,22 @@ using UnityEngine.UIElements;
 public class Player : MonoBehaviour
 {
     private Vector2 moveInput = Vector2.zero;
-    private SpriteRenderer sr;
-    private PlayerInput playerInput;
+    [SerializeField] private SpriteRenderer sr;
+    [SerializeField] private Animator animator;
+    private PlayerInput playerInput;    
     private Rigidbody2D rb;
+    
+
+  
     
     [SerializeField] private StatsObject stats;
     public float speed = 1;
     public float range = 1;
 
+    private float nextTurret =0;
+    public float turretCooldown;
+
+   
     [SerializeField] private GameObject attackPf;
     [SerializeField] private Vector2 attackOffsetPoint;
     private bool attacking = false;
@@ -23,7 +31,6 @@ public class Player : MonoBehaviour
 
     private void Awake(){
         rb = gameObject.GetComponent<Rigidbody2D>();
-        sr = gameObject.GetComponent<SpriteRenderer>();
         playerInput = gameObject.GetComponent<PlayerInput>();
 
         speed = stats.speed;
@@ -38,6 +45,8 @@ public class Player : MonoBehaviour
             rb.velocity = Vector2.zero;
         }
         if(Time.time > attackEnd) attacking = false;
+
+        if(Input.GetKeyDown(KeyCode.T)) PlaceTurret();
     }
 
 
@@ -47,6 +56,40 @@ public class Player : MonoBehaviour
     }
 
     public void OnRightClick(InputAction.CallbackContext ctx){
+        
+    }
+
+    private void MovePlayer(Vector2 dir){
+        Vector3 move = new Vector3(dir.x, dir.y, 0);
+        rb.velocity = move * speed;
+        
+        //sort layer
+        sr.sortingOrder = Mathf.RoundToInt(-transform.position.y * 100);
+
+        //animate
+        if(move != Vector3.zero){
+            animator.SetBool("Moving", true);
+        }
+        else{
+            animator.SetBool("Moving", false);
+        }
+
+        //flip player
+        if(rb.velocity.x == 0) return;
+        Vector3 scale = gameObject.transform.localScale;
+
+        if(rb.velocity.x > 0){ //move right
+            scale.x = Mathf.Abs(scale.x) * -1;
+        }
+        else if(rb.velocity.x < 0){
+            scale.x = Mathf.Abs(scale.x);
+        }
+        gameObject.transform.localScale = scale;
+
+
+    }
+
+    private void Attack(){
         if(attacking || nextAttackTime > Time.time) return;
 
 
@@ -73,26 +116,17 @@ public class Player : MonoBehaviour
         scale.x *= flip;
         attack.transform.localScale = scale;
     }
+    
+    private void PlaceTurret(){
+        if(nextTurret > Time.time) return;
 
-    private void MovePlayer(Vector2 dir){
-        Vector3 move = new Vector3(dir.x, dir.y, 0);
-        rb.velocity = move * speed;
         
-        //sort layer
-        sr.sortingOrder = Mathf.RoundToInt(-transform.position.y * 100);
-
-        //flip player
-        if(rb.velocity.x == 0) return;
-        Vector3 scale = gameObject.transform.localScale;
-
-        if(rb.velocity.x > 0){ //move right
-            scale.x = Mathf.Abs(scale.x) * -1;
-        }
-        else if(rb.velocity.x < 0){
-            scale.x = Mathf.Abs(scale.x);
-        }
-        gameObject.transform.localScale = scale;
-
-
+        Vector3 pos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        pos.z = 0;
+        if(GameManager.Instance.SpawnTurret(pos)){ //placement succes
+            nextTurret = Time.time + turretCooldown;
+        } 
+        
     }
+    
 }

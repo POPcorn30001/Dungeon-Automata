@@ -6,6 +6,7 @@ public class Entity : MonoBehaviour
 {
 
     public GameManager.EntityClass entityClass = GameManager.EntityClass.Player;
+    public bool Flip = false;
     private Rigidbody2D rb;
     private SpriteRenderer sr;
 
@@ -13,6 +14,7 @@ public class Entity : MonoBehaviour
     [SerializeField] private StatsObject stats;
     public float range = 1;
     public float speed= 1;
+    
 
 
     [SerializeField] private GameObject attackPf;
@@ -30,8 +32,8 @@ public class Entity : MonoBehaviour
         speed = stats.speed;
         range = stats.range;
         nextAttackTime = Time.time;
+        sr.sortingOrder = Mathf.RoundToInt(-transform.position.y * 100);
 
-        GameManager.Instance.AddEntityToList(gameObject, entityClass);
     }
 
     // Update is called once per frame
@@ -76,10 +78,11 @@ public class Entity : MonoBehaviour
 
         //sort layer
         sr.sortingOrder = Mathf.RoundToInt(-transform.position.y * 100);
+        FlipEntity(targetDir.x, Flip);
 
 
         //atack target
-        if(Time.time >= nextAttackTime) Attack(targetDistance, targetDir, GameManager.EntityClass.Enemy);
+        if(Time.time >= nextAttackTime) Attack(targetDistance, currentTarget.transform.position, GameManager.EntityClass.Enemy);
 
         
         
@@ -99,6 +102,7 @@ public class Entity : MonoBehaviour
         Vector3 targetDir = (currentTarget.transform.position - gameObject.transform.position).normalized;
         float targetDistance = Vector2.Distance(gameObject.transform.position, currentTarget.transform.position);
 
+        //move
         if(targetDistance > range){
 
             rb.velocity = targetDir * speed;
@@ -108,16 +112,17 @@ public class Entity : MonoBehaviour
 
         //sort layer
         sr.sortingOrder = Mathf.RoundToInt(-transform.position.y * 100);
+        FlipEntity(targetDir.x, Flip);
 
         //atack target
         if(Time.time >= nextAttackTime){
-            Attack(targetDistance, targetDir, GameManager.EntityClass.Player);
+            Attack(targetDistance, currentTarget.transform.position, GameManager.EntityClass.Player);
             Debug.Log("turret shooting, target dir: "+targetDir);
         } 
 
         
     }
-    private void Attack(float targetDistance, Vector3 targetDir, GameManager.EntityClass sender){
+    private void Attack(float targetDistance, Vector3 targetPos, GameManager.EntityClass sender){
 
         if(targetDistance <= range){
 
@@ -125,6 +130,9 @@ public class Entity : MonoBehaviour
             attackEnd = Time.time + stats.attackTime;
             nextAttackTime = Time.time + stats.attackSpeed;
             Vector3 spawnPos = gameObject.transform.position;
+            Vector3 targetDir = (targetPos - new Vector3(gameObject.transform.position.x + attackOffsetPoint.x, gameObject.transform.position.y + attackOffsetPoint.y, 0)).normalized;
+
+
             spawnPos.x += targetDir.x * attackOffset+ attackOffsetPoint.x;
             spawnPos.y += targetDir.y * attackOffset + attackOffsetPoint.y;
             
@@ -134,6 +142,37 @@ public class Entity : MonoBehaviour
             attack.GetComponent<Attack>().Setup(targetDir, sender);
             
         }
+    }
+
+    private void FlipEntity(float dirx, bool mirrorFLip){
+        //flip player
+        if(dirx == 0) return;
+        Vector3 scale = gameObject.transform.localScale;
+
+        if(dirx > 0){ //move right
+            
+            if(mirrorFLip){
+                scale.x = Mathf.Abs(scale.x);
+                attackOffsetPoint.x = Mathf.Abs(attackOffsetPoint.x);
+            }
+            else{
+                scale.x = Mathf.Abs(scale.x) * -1;
+                attackOffsetPoint.x = Mathf.Abs(attackOffsetPoint.x) * -1;
+            }
+            
+        }
+        else if(dirx < 0){ //move left
+            
+            if(mirrorFLip){
+                scale.x = Mathf.Abs(scale.x) * -1;
+                attackOffsetPoint.x = Mathf.Abs(attackOffsetPoint.x) * -1;
+            }
+            else{
+                scale.x = Mathf.Abs(scale.x);
+                attackOffsetPoint.x = Mathf.Abs(attackOffsetPoint.x);
+            }
+        }
+        gameObject.transform.localScale = scale;
     }
 
 }
