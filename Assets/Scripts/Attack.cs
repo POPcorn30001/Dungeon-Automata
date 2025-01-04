@@ -7,13 +7,13 @@ public class Attack : MonoBehaviour
 {
     private GameManager.EntityClass entityClass = GameManager.EntityClass.Player;
     private Rigidbody2D rb;
+    private List<GameObject> targetsHit = new List<GameObject>();
     
     [SerializeField] private AttackObject stats;
     public float speed = 1;
     private float lifetimeEnd = 1;
     public int damage = 0;
-    private bool enemyHit = false;
-    private bool AOE = false;
+    [SerializeField] private bool AOE = false;
     public Vector2 dir = Vector2.zero;
 
 
@@ -63,8 +63,10 @@ public class Attack : MonoBehaviour
                 return;
             }
 
-            if(!enemyHit) health.TakeDamage(damage);
-            enemyHit = true;
+            if(!targetsHit.Contains(collider.gameObject) ){
+                health.TakeDamage(damage);
+                targetsHit.Add(collider.gameObject);
+            } 
         }
 
         //hit obstacle

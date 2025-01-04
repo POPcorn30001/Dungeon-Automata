@@ -9,14 +9,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e008b8c2d1a234f4994503502e2d8909, type: 3}
-  m_Name: Stats - Zombie
+  m_Script: {fileID: 11500000, guid: 77265aecc6c819f40a2331492d822cc2, type: 3}
+  m_Name: Attack - Explosion
   m_EditorClassIdentifier: 
-  health: 50
-  dmg: 10
+  damage: 20
+  lifespan: 0.5
   speed: 0
-  range: 1.5
-  attackSpeed: 2
-  attackTime: 0.4
-  ranged: 0
-  entityClass: 1

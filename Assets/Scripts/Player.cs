@@ -47,7 +47,7 @@ public class Player : MonoBehaviour
         }
         if(Time.time > attackEnd) attacking = false;
 
-        if(Input.GetKeyDown(KeyCode.T)) PlaceTurret();
+        if(Input.GetKeyDown(KeyCode.R)) PlaceTurret();
 
         if(interactHeld){
             GameObject closestBox = GameManager.Instance.NearestEntity(GameManager.EntityClass.RobotBox, gameObject.transform.position);

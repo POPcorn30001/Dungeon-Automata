@@ -20,6 +20,7 @@ public class GameManager : MonoBehaviour
     //UI
     [SerializeField] private TMP_Text enemiesLeftText;
     [SerializeField] private GameObject menuPanel;
+    [SerializeField] private GameObject hint;
     [SerializeField] private GameObject overPanel;
     [SerializeField] private GameObject winPanel;
     [SerializeField] private GameObject settingsPanel;
@@ -200,6 +201,7 @@ public class GameManager : MonoBehaviour
     public bool SpawnRobot(Vector3 pos){
         if(menuActive || !gameRunning) return false;
 
+        hint.SetActive(false);
         if(parts <= 0){ //not enough parts
 
             return false;
@@ -234,6 +236,7 @@ public class GameManager : MonoBehaviour
     }
     public void OnCLickSettings(){
         if(!gameRunning) return;
+
         if(settingsActive){
             settingsPanel.SetActive(false);
             settingsActive = false;
@@ -282,5 +285,9 @@ public class GameManager : MonoBehaviour
 
     private void FollowPlayer(){ //becouse of button play sound
         gameObject.transform.position = player.transform.position;
+    }
+
+    public void ChangeVolume(float value){
+        AudioListener.volume = value;
     }
 }

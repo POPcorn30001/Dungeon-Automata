@@ -39,8 +39,9 @@ public class Robot : MonoBehaviour
     [SerializeField]private bool rangedEnabled = false;
     [SerializeField]private float nextAttackMelee =0;
     [SerializeField]private float nextAttackRanged =0;
+    
 
-    [SerializeField] private float attackOffset;
+    [SerializeField] private float meleeOffset =1;
     [SerializeField] private Vector2 attackOffsetPoint;
     [SerializeField] float targetDistance =0;
     [SerializeField] Vector3 targetDir = Vector3.zero;
@@ -135,23 +136,24 @@ public class Robot : MonoBehaviour
 
         if(nextAttackRanged > Time.time || targetDistance > rangeRanged) return;
         nextAttackRanged = Time.time + rangedAttackSpeed;
-        Attack(rangedAttackPf);
+        Attack(rangedAttackPf, false);
     }
 
     private void Melee(){
         if(nextAttackMelee > Time.time || targetDistance > rangeMelee) return;
         nextAttackMelee = Time.time + meleeAttackSpeed;
-        Attack(meleeAttackPf);
+        Debug.Log("Robot melle atack");
+        Attack(meleeAttackPf, true);
     }
     private void Move(){
         
 
         //move
-        if( (meleeEnabled && targetDistance >= rangeMelee) || (rangedEnabled && targetDistance >= rangeRanged)){ //not in range
+        if( (meleeEnabled && targetDistance > rangeMelee) || (rangedEnabled && targetDistance > rangeRanged)){ //not in range
 
             rb.velocity = targetDir * speed;
         }
-        else if(!meleeEnabled && rangedEnabled && targetDistance < rangeRanged){ //flee when only ranged
+        else if(!meleeEnabled && rangedEnabled && targetDistance < rangeRanged-1){ //flee when only ranged
             rb.velocity = (-targetDir) * speed;
         }
         else if(!meleeEnabled && !rangedEnabled && targetDistance > 0.5){ //only move
@@ -165,17 +167,24 @@ public class Robot : MonoBehaviour
 
         if(targetDistance < 1){
             for(int i =0; i < explodeAmount; i++){
-                Attack(explodeAttackPf);
+                Attack(explodeAttackPf, false);
             }
+            gameObject.GetComponent<Health>().TakeDamage(100);
         }
     }
-    private void Attack(GameObject attackPf){
+    private void Attack(GameObject attackPf, bool melee){
         if(!attackPf) return;
-        
+
         Vector3 spawnPos = gameObject.transform.position;
 
-        spawnPos.x += targetDir.x * attackOffset+ attackOffsetPoint.x;
-        spawnPos.y += targetDir.y * attackOffset + attackOffsetPoint.y;
+        if(!melee){
+            spawnPos.x += attackOffsetPoint.x;
+            spawnPos.y += attackOffsetPoint.y;
+        }
+        else{
+            spawnPos.x += targetDir.x * meleeOffset;
+            spawnPos.y += targetDir.y * meleeOffset;
+        }
         
         float angle = Mathf.Atan2(targetDir.y, targetDir.x) * Mathf.Rad2Deg;
         Quaternion rotation = Quaternion.Euler(0f, 0f, angle);

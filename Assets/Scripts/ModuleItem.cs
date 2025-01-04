@@ -25,6 +25,9 @@ public class ModuleItem : MonoBehaviour
             case RobotBox.Components.Move:
                 EditText("Move Module");
                 break;
+            case RobotBox.Components.Explode:
+                EditText("Explosion load");
+                break;
             default:
                 EditText("Missing Variant");
                 break;
