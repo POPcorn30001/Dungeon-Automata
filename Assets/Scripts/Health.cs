@@ -45,12 +45,11 @@ public class Health : MonoBehaviour
 
     void KillEntity(){
 
-
+        GameManager.Instance.RemoveEntityFromList(target, entityClass);
+        
         if(isPlayer){
             GameManager.Instance.EndGame();
         }
-
-        GameManager.Instance.RemoveEntityFromList(target, entityClass);
         Destroy(gameObject);
     }
 

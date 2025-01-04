@@ -110,7 +110,7 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Dungeon Automata_0
+      name: Slash
       rect:
         serializedVersion: 2
         x: 805
@@ -131,7 +131,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Dungeon Automata_1
+      name: Energy Projectile
       rect:
         serializedVersion: 2
         x: 949
@@ -152,7 +152,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Dungeon Automata_2
+      name: Wrench
       rect:
         serializedVersion: 2
         x: 1104
@@ -173,11 +173,11 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Dungeon Automata_3
+      name: Health Icon
       rect:
         serializedVersion: 2
         x: 1361
-        y: 997
+        y: 998
         width: 124
         height: 138
       alignment: 0
@@ -194,7 +194,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Dungeon Automata_4
+      name: Bolt
       rect:
         serializedVersion: 2
         x: 563
@@ -236,7 +236,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Dungeon Automata_6
+      name: Parts Icon
       rect:
         serializedVersion: 2
         x: 1361
@@ -445,6 +445,48 @@ TextureImporter:
       indices: 
       edges: []
       weights: []
+    - serializedVersion: 2
+      name: Fill
+      rect:
+        serializedVersion: 2
+        x: 1028
+        y: 66
+        width: 251
+        height: 250
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d5a16d5c1e378c4498a58340507533ec
+      internalID: -591611080
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Dungeon Automata_8
+      rect:
+        serializedVersion: 2
+        x: 1405
+        y: 126
+        width: 142
+        height: 206
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 5d0a362486e616042b927cc0d6431d06
+      internalID: 225712646
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
     outline: []
     physicsShape: []
     bones: []
@@ -456,21 +498,23 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     nameFileIdTable:
+      Bolt: 2103578285
       Box: 1364491894
       Button1: 77010508
       Button2: 1409770918
       Crossbowman: -1010823241
-      Dungeon Automata_0: -1426932186
-      Dungeon Automata_1: -830064955
       Dungeon Automata_12: -634771448
       Dungeon Automata_14: 1921514445
-      Dungeon Automata_2: 861825949
-      Dungeon Automata_3: -1806506640
-      Dungeon Automata_4: 2103578285
       Dungeon Automata_5: -53695072
-      Dungeon Automata_6: -6435075
+      Dungeon Automata_8: 225712646
+      Energy Projectile: -830064955
       Erk: 145652406
+      Fill: -591611080
+      Health Icon: -1806506640
+      Parts Icon: -6435075
+      Slash: -1426932186
       Turret: 48961330
+      Wrench: 861825949
       Zombie: 98988739
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0

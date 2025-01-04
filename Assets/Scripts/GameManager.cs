@@ -1,35 +1,40 @@
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
-
-    bool GameRunning = true;
+    [SerializeField] Difficulty difficulty;
+    bool gameRunning = true;
     public bool playerAlive = true;
     private float nextHeal = 0;
     public float passiveRegenerationSpeed = 2;
     public GameObject player;
     public int parts = 10;
+    public int enemiesLeft =26;
 
-    private bool menuActive = false;
-    private bool settingsActive = false;
-    
+   
+    //UI
+    [SerializeField] private TMP_Text enemiesLeftText;
     [SerializeField] private GameObject menuPanel;
     [SerializeField] private GameObject overPanel;
+    [SerializeField] private GameObject winPanel;
     [SerializeField] private GameObject settingsPanel;
     [SerializeField] private PlayerPanel playerPanel;
+     [SerializeField] private Canvas worldCanvas;
+    private bool menuActive = false;
+    private bool settingsActive = false;
+
+
+    //Entity list
     public enum EntityClass
     {
         Player,
-        Enemy
-    }
-    //sInstance vypujceno z 1zherv projektu
-    private static GameManager sInstance;
-    public static GameManager Instance{ 
-        get { return sInstance; } 
+        Enemy,
+        RobotBox
     }
     /// <summary>
     /// List of friendly entities in the game, including the player
@@ -40,6 +45,21 @@ public class GameManager : MonoBehaviour
     /// List of hostile entities in the game
     /// </summary>
     private List<GameObject> enemyEntities = new List<GameObject>();
+     /// <summary>
+    /// List of robot boxes in the game
+    /// </summary>
+    private List<GameObject> robotBoxEntities = new List<GameObject>();
+
+
+    //sInstance vypujceno z 1zherv projektu
+    private static GameManager sInstance;
+    public static GameManager Instance{ 
+        get { return sInstance; } 
+    }
+    
+
+    //Audio
+    private AudioSource audioSource;
 
     void Awake()
     {
@@ -48,10 +68,10 @@ public class GameManager : MonoBehaviour
         else
         { sInstance = this; }
 
-
-        menuPanel.SetActive(false);
-        settingsPanel.SetActive(false);
-        overPanel.SetActive(false);
+        audioSource = gameObject.GetComponent<AudioSource>();
+        PrepareGame();
+        
+        
     }
 
     // Update is called once per frame
@@ -63,14 +83,44 @@ public class GameManager : MonoBehaviour
             nextHeal = Time.time + passiveRegenerationSpeed;
             player.GetComponent<Health>().Heal(1);
         }
+
+        if(playerAlive && enemiesLeft <= 0){
+            WinGame();
+            
+        }
     }
 
     private void PrepareGame(){
+        //UI
+        menuPanel.SetActive(false);
+        settingsPanel.SetActive(false);
+        overPanel.SetActive(false);
+        winPanel.SetActive(false);
 
+
+
+        enemiesLeft = 26 + 5*difficulty.extraEnemies;
+        UpdateEnemies(enemiesLeft);
+        gameRunning = true;
     }
     public void EndGame(){
+        
         playerAlive = false;
-        //TODO
+        gameRunning = false;
+        overPanel.SetActive(true);
+
+        menuPanel.SetActive(false);
+        settingsPanel.SetActive(false);
+        winPanel.SetActive(false);
+    }
+
+    public void WinGame(){
+        winPanel.SetActive(true);
+
+        overPanel.SetActive(true);
+        menuPanel.SetActive(false);
+        settingsPanel.SetActive(false);
+        gameRunning = false;
     }
 
     /// <summary>
@@ -110,6 +160,9 @@ public class GameManager : MonoBehaviour
             case EntityClass.Enemy:
                 targetList = enemyEntities;
                 break;
+            case EntityClass.RobotBox:
+                targetList = robotBoxEntities;
+                break;
             default: 
                 return null;
         }
@@ -133,15 +186,17 @@ public class GameManager : MonoBehaviour
 
         //if enemy chance to spawn parts
         if(targetType == EntityClass.Enemy){
-            if(Random.Range(0,3) == 1){
+            enemiesLeft--;
+            UpdateEnemies(enemiesLeft);
+            if(Random.Range(0,5) == 1){
                 parts ++;
                 playerPanel.SetParts(parts);
             }
         }
     }
 
-    public bool SpawnTurret(Vector3 pos){
-        if(menuActive || !playerAlive) return false;
+    public bool SpawnRobot(Vector3 pos){
+        if(menuActive || !gameRunning) return false;
 
         if(parts <= 0){ //not enough parts
 
@@ -151,12 +206,12 @@ public class GameManager : MonoBehaviour
         parts--;
         playerPanel.SetParts(parts);
         
-        Instantiate(Resources.Load<GameObject>("Prefabs/Turret"), pos, Quaternion.identity);
+        Instantiate(Resources.Load<GameObject>("Prefabs/RobotBox"), pos, Quaternion.identity);
         return true;
     }
 
     public void OnClickMenu(){
-        if(!playerAlive) return;
+        if(!gameRunning) return;
         if(menuActive){ //close menu
             menuPanel.SetActive(false);
             settingsPanel.SetActive(false);
@@ -176,7 +231,7 @@ public class GameManager : MonoBehaviour
         }
     }
     public void OnCLickSettings(){
-        if(!playerAlive) return;
+        if(!gameRunning) return;
         if(settingsActive){
             settingsPanel.SetActive(false);
             settingsActive = false;
@@ -187,6 +242,44 @@ public class GameManager : MonoBehaviour
         }
     }
     public void OnCLickStartingScreen(){
+        Time.timeScale = 1f;
+        RestartDifficulty();
         SceneManager.LoadScene(0);
+    }
+
+    public void OnCLickRestart(){
+        Time.timeScale = 1f;
+        RestartDifficulty();
+        SceneManager.LoadScene(1);
+    }
+    public void OnCLickNextLevel(){
+        Time.timeScale = 1f;
+        IncreaseDifficutly();
+        SceneManager.LoadScene(1);
+    }
+    public Canvas GetWorldCanvas(){
+        return worldCanvas;
+    }
+
+    public void PlayButtonSound(){
+        audioSource.Play();
+    }
+
+    private void RestartDifficulty(){
+        difficulty.extraEnemies = 0;
+        difficulty.spawnerSpeedup = 1;
+    }
+
+    private void IncreaseDifficutly(){
+        difficulty.extraEnemies += 2;
+        difficulty.spawnerSpeedup *=2;
+    }
+
+    private void UpdateEnemies(int count){
+        enemiesLeftText.text = "Enemies left: "+count;
+    }
+
+    private void FollowPlayer(){ //becouse of button play sound
+        gameObject.transform.position = player.transform.position;
     }
 }

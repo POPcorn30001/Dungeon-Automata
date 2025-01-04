@@ -9,9 +9,8 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 77265aecc6c819f40a2331492d822cc2, type: 3}
-  m_Name: Attack - Bolt
+  m_Script: {fileID: 11500000, guid: 07f8b8fad0dc7c049b30276933e5cf2e, type: 3}
+  m_Name: Difficulty
   m_EditorClassIdentifier: 
-  damage: 5
-  lifespan: 10
-  speed: 8
+  extraEnemies: 0
+  spawnerSpeedup: 1

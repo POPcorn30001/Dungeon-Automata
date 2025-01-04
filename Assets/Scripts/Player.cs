@@ -21,6 +21,7 @@ public class Player : MonoBehaviour
 
     private float nextTurret =0;
     public float turretCooldown;
+    private bool interactHeld = false;
 
    
     [SerializeField] private GameObject attackPf;
@@ -47,6 +48,13 @@ public class Player : MonoBehaviour
         if(Time.time > attackEnd) attacking = false;
 
         if(Input.GetKeyDown(KeyCode.T)) PlaceTurret();
+
+        if(interactHeld){
+            GameObject closestBox = GameManager.Instance.NearestEntity(GameManager.EntityClass.RobotBox, gameObject.transform.position);
+            if(!closestBox) return;
+        
+            closestBox.GetComponent<RobotBox>().OnInteract();
+        }
     }
 
 
@@ -55,8 +63,8 @@ public class Player : MonoBehaviour
         //Debug.Log(moveInput);
     }
 
-    public void OnRightClick(InputAction.CallbackContext ctx){
-        
+    public void OnInteract(InputAction.CallbackContext ctx){
+        interactHeld = ctx.ReadValueAsButton();
     }
 
     private void MovePlayer(Vector2 dir){
@@ -123,7 +131,7 @@ public class Player : MonoBehaviour
         
         Vector3 pos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         pos.z = 0;
-        if(GameManager.Instance.SpawnTurret(pos)){ //placement succes
+        if(GameManager.Instance.SpawnRobot(pos)){ //placement succes
             nextTurret = Time.time + turretCooldown;
         } 
         

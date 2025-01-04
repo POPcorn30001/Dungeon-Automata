@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   health: 40
   dmg: 0
-  speed: 0.9
+  speed: 0.8
   range: 7
   attackSpeed: 2
   attackTime: 1

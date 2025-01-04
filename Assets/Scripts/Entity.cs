@@ -61,7 +61,8 @@ public class Entity : MonoBehaviour
         //find target
         currentTarget = GameManager.Instance.NearestEntity(GameManager.EntityClass.Player, gameObject.transform.position);
         if(currentTarget == null){ //no player entities left, stop moving
-            this.enabled = false;
+            rb.velocity = Vector3.zero;
+            return;
         }
         
 
@@ -126,8 +127,8 @@ public class Entity : MonoBehaviour
 
         if(targetDistance <= range){
 
-            attacking = true;
             attackEnd = Time.time + stats.attackTime;
+            attacking = true;
             nextAttackTime = Time.time + stats.attackSpeed;
             Vector3 spawnPos = gameObject.transform.position;
             Vector3 targetDir = (targetPos - new Vector3(gameObject.transform.position.x + attackOffsetPoint.x, gameObject.transform.position.y + attackOffsetPoint.y, 0)).normalized;

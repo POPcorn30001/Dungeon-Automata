@@ -1,15 +1,31 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
 public class MenuManager : MonoBehaviour
 {
     [SerializeField] private GameObject creditPanel;
+    [SerializeField] private Difficulty difficulty;
     private bool creditsActive;
+    private bool startingGame = false;
+    [SerializeField] private AudioSource audioSource;
+
+    void Start(){
+        audioSource = gameObject.GetComponent<AudioSource>();
+    }
+
+    void Update(){
+        if(startingGame && !audioSource.isPlaying){
+            SceneManager.LoadSceneAsync(1);
+        }
+    }
 
     public void OnPlayClicked(){
-        SceneManager.LoadScene(1);
+        difficulty.extraEnemies = 0;
+        difficulty.spawnerSpeedup = 1;
+        startingGame = true;
     }
 
     public void OnCreditsClicked(){
@@ -28,8 +44,8 @@ public class MenuManager : MonoBehaviour
         Application.Quit();
     }
 
-    private void PlayButtonSound(){
-       
+    public void PlayButtonSound(){
+        audioSource.Play();
     }
 
 }

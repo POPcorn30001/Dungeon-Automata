@@ -16,7 +16,7 @@ MonoBehaviour:
   dmg: 10
   speed: 1
   range: 1.5
-  attackSpeed: 1
+  attackSpeed: 2
   attackTime: 0.4
   ranged: 0
   entityClass: 1

@@ -12,6 +12,7 @@ public class Attack : MonoBehaviour
     public float speed = 1;
     private float lifetimeEnd = 1;
     public int damage = 0;
+    private bool enemyHit = false;
     private bool AOE = false;
     public Vector2 dir = Vector2.zero;
 
@@ -53,8 +54,8 @@ public class Attack : MonoBehaviour
         //ignore other projectiles
         Attack attack = collider.GetComponent<Attack>();
         if(attack) return;
-        //hit entity
 
+        //hit entity
         Health health = collider.GetComponent<Health>();
         if(health){
             
@@ -62,7 +63,8 @@ public class Attack : MonoBehaviour
                 return;
             }
 
-            health.TakeDamage(damage);
+            if(!enemyHit) health.TakeDamage(damage);
+            enemyHit = true;
         }
 
         //hit obstacle
