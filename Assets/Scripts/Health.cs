@@ -9,6 +9,7 @@ public class Health : MonoBehaviour
     [SerializeField] private GameObject target; //what enemies are agroing
     public GameManager.EntityClass entityClass;
     public int health;
+    private int maxHealth;
 
     public bool isPlayer = false;
     
@@ -20,6 +21,8 @@ public class Health : MonoBehaviour
             entityClass = stats.entityClass;
         } 
         else health = 20;
+
+        maxHealth = health;
 
         GameManager.Instance.AddEntityToList(target, entityClass);
     }
@@ -53,6 +56,9 @@ public class Health : MonoBehaviour
 
     public void Heal(int val){
         health += val;
+        if(health > maxHealth) health = maxHealth;
+
+        if(isPlayer) playerPanel.SetHealth(health);
     }
 
 

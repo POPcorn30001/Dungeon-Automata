@@ -8,12 +8,19 @@ public class GameManager : MonoBehaviour
 {
 
     bool GameRunning = true;
+    public bool playerAlive = true;
+    private float nextHeal = 0;
+    public float passiveRegenerationSpeed = 2;
     public GameObject player;
+    public int parts = 10;
 
     private bool menuActive = false;
     private bool settingsActive = false;
+    
     [SerializeField] private GameObject menuPanel;
+    [SerializeField] private GameObject overPanel;
     [SerializeField] private GameObject settingsPanel;
+    [SerializeField] private PlayerPanel playerPanel;
     public enum EntityClass
     {
         Player,
@@ -44,16 +51,25 @@ public class GameManager : MonoBehaviour
 
         menuPanel.SetActive(false);
         settingsPanel.SetActive(false);
+        overPanel.SetActive(false);
     }
 
     // Update is called once per frame
     void Update()
     {
         if(Input.GetKeyDown(KeyCode.Escape)) OnClickMenu();
+
+        if(playerAlive && Time.time >= nextHeal){
+            nextHeal = Time.time + passiveRegenerationSpeed;
+            player.GetComponent<Health>().Heal(1);
+        }
     }
 
+    private void PrepareGame(){
 
+    }
     public void EndGame(){
+        playerAlive = false;
         //TODO
     }
 
@@ -114,15 +130,33 @@ public class GameManager : MonoBehaviour
         if(targetList.Contains(target)){
             targetList.Remove(target);
         } 
+
+        //if enemy chance to spawn parts
+        if(targetType == EntityClass.Enemy){
+            if(Random.Range(0,3) == 1){
+                parts ++;
+                playerPanel.SetParts(parts);
+            }
+        }
     }
 
     public bool SpawnTurret(Vector3 pos){
-        if(menuActive) return false;
+        if(menuActive || !playerAlive) return false;
+
+        if(parts <= 0){ //not enough parts
+
+            return false;
+        }
+
+        parts--;
+        playerPanel.SetParts(parts);
+        
         Instantiate(Resources.Load<GameObject>("Prefabs/Turret"), pos, Quaternion.identity);
         return true;
     }
 
     public void OnClickMenu(){
+        if(!playerAlive) return;
         if(menuActive){ //close menu
             menuPanel.SetActive(false);
             settingsPanel.SetActive(false);
@@ -142,6 +176,7 @@ public class GameManager : MonoBehaviour
         }
     }
     public void OnCLickSettings(){
+        if(!playerAlive) return;
         if(settingsActive){
             settingsPanel.SetActive(false);
             settingsActive = false;
