@@ -23,7 +23,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] private GameObject overPanel;
     [SerializeField] private GameObject winPanel;
     [SerializeField] private GameObject settingsPanel;
-    [SerializeField] private PlayerPanel playerPanel;
+    public PlayerPanel playerPanel;
      [SerializeField] private Canvas worldCanvas;
     private bool menuActive = false;
     private bool settingsActive = false;
@@ -59,7 +59,7 @@ public class GameManager : MonoBehaviour
     
 
     //Audio
-    private AudioSource audioSource;
+    public AudioSource audioSource;
 
     void Awake()
     {
@@ -88,6 +88,8 @@ public class GameManager : MonoBehaviour
             WinGame();
             
         }
+
+        FollowPlayer();
     }
 
     private void PrepareGame(){
@@ -246,7 +248,6 @@ public class GameManager : MonoBehaviour
         RestartDifficulty();
         SceneManager.LoadScene(0);
     }
-
     public void OnCLickRestart(){
         Time.timeScale = 1f;
         RestartDifficulty();

@@ -13,13 +13,11 @@ public class RobotBox : MonoBehaviour
         Heal
     }
 
-    private List<Components> parts = new List<Components>();
+    public List<Components> parts = new List<Components>();
     [SerializeField] GameObject indicatorPanelPrefab;
-    [SerializeField] GameObject tinkerPanelPrefab;
     private GameObject indicatorPanel;
     [SerializeField] private Vector2 indicatorPanelOffset;
     private Indicator indicator;
-    private GameObject tinkerPanel;
     private Canvas worldUiCanvas;
 
     
@@ -42,6 +40,8 @@ public class RobotBox : MonoBehaviour
 
         SpriteRenderer sr = gameObject.GetComponent<SpriteRenderer>();
         sr.sortingOrder = Mathf.RoundToInt(-transform.position.y * 100);
+
+        indicator.HideHold();
         
         //spawn UI
     }
@@ -65,14 +65,10 @@ public class RobotBox : MonoBehaviour
         if(!playerInRange) return;
         
         if(!hasComponents){ //tinker phase
-            //TODO, skip
-
-
-
-
-
-            hasComponents = true;
-            indicator.ShowHold();
+            GameManager.Instance.audioSource.Play();
+            TinkerPanel.Instance.gameObject.SetActive(true);
+            TinkerPanel.Instance.lastBox = gameObject;
+            Time.timeScale = 0f;
 
         }
         else{ //build phase
@@ -84,14 +80,24 @@ public class RobotBox : MonoBehaviour
         }
     }
 
+    public void SetComponents(List<Components> list){
+
+        Debug.Log("list recieved");
+        foreach (var component in list)
+        {
+            parts.Add(component);
+        }
+        hasComponents = true;
+        indicator.ShowHold();
+    }
     private void FinisBuild(){
         //spawn robot
         Debug.Log("building done");
         Destroy(indicatorPanel);
-        Destroy(tinkerPanel);
 
         GameManager.Instance.RemoveEntityFromList(gameObject, GameManager.EntityClass.RobotBox);
-        Instantiate(Resources.Load<GameObject>("Prefabs/Turret"), gameObject.transform.position, Quaternion.identity);
+        GameObject bobot = Instantiate(Resources.Load<GameObject>("Prefabs/Robot"), gameObject.transform.position, Quaternion.identity);
+        bobot.GetComponent<Robot>().RobotSetUp(parts);
         Destroy(gameObject);
     }
     

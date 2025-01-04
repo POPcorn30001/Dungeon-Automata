@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class Robot : MonoBehaviour
@@ -10,7 +11,7 @@ public class Robot : MonoBehaviour
     private Rigidbody2D rb;
     private SpriteRenderer sr;
 
-    private GameObject currentTarget;
+    [SerializeField] private GameObject currentTarget;
     [SerializeField] private StatsObject stats;
     
 
@@ -19,27 +20,30 @@ public class Robot : MonoBehaviour
 
     //move
     public float speed= 1;
-    private bool moveEnabled = false;
+    [SerializeField] private bool moveEnabled = false;
 
     
-    
+    //explode
+    [SerializeField] private GameObject explodeAttackPf;
+    private bool explodeEnabled = false;
+    private int explodeAmount = 1;
 
     //Attacking
     [SerializeField] private GameObject meleeAttackPf;
     [SerializeField] private GameObject rangedAttackPf;
-    private float rangeMelee = 1;
-    private float rangeRanged = 7;
-    private float meleeAttackSpeed = 2;
-    private float rangedAttackSpeed = 3;
-    private bool meleeEnabled =false;
-    private bool rangedEnabled = false;
-    private float nextAttackMelee =0;
-    private float nextAttackRanged =0;
+    [SerializeField]private float rangeMelee = 1;
+    [SerializeField]private float rangeRanged = 7;
+    [SerializeField]private float meleeAttackSpeed = 2;
+    [SerializeField]private float rangedAttackSpeed = 3;
+    [SerializeField]private bool meleeEnabled =false;
+    [SerializeField]private bool rangedEnabled = false;
+    [SerializeField]private float nextAttackMelee =0;
+    [SerializeField]private float nextAttackRanged =0;
 
     [SerializeField] private float attackOffset;
     [SerializeField] private Vector2 attackOffsetPoint;
-    float targetDistance =0;
-    Vector3 targetDir = Vector3.zero;
+    [SerializeField] float targetDistance =0;
+    [SerializeField] Vector3 targetDir = Vector3.zero;
     
     
     
@@ -49,7 +53,7 @@ public class Robot : MonoBehaviour
     void Start()
     {
         sr = gameObject.GetComponent<SpriteRenderer>();
-        rb = gameObject.GetComponent<Rigidbody2D>();
+        
 
         sr.sortingOrder = Mathf.RoundToInt(-transform.position.y * 100);
     }
@@ -67,12 +71,14 @@ public class Robot : MonoBehaviour
         if(rangedEnabled) Ranged();
         if(meleeEnabled) Melee();
         if(moveEnabled) Move();
+        if(explodeEnabled) Explode();
+        FlipEntity(targetDir.x, Flip);
     }   
 
     public void RobotSetUp(List<RobotBox.Components> partsList){
         
         //set base stats
-
+        rb = gameObject.GetComponent<Rigidbody2D>();
 
 
 
@@ -107,6 +113,14 @@ public class Robot : MonoBehaviour
                         speed += 2;
                     }
                     break;
+                case RobotBox.Components.Explode:
+                    if(!explodeEnabled){
+                        explodeEnabled = true;
+                    }
+                    else{
+                        explodeAmount += 1;
+                    }
+                    break;
                 default:
                     break;
             }
@@ -121,44 +135,54 @@ public class Robot : MonoBehaviour
 
         if(nextAttackRanged > Time.time || targetDistance > rangeRanged) return;
         nextAttackRanged = Time.time + rangedAttackSpeed;
-
-
+        Attack(rangedAttackPf);
     }
 
     private void Melee(){
-
+        if(nextAttackMelee > Time.time || targetDistance > rangeMelee) return;
+        nextAttackMelee = Time.time + meleeAttackSpeed;
+        Attack(meleeAttackPf);
     }
     private void Move(){
         
 
         //move
-        if(targetDistance > range){
+        if( (meleeEnabled && targetDistance >= rangeMelee) || (rangedEnabled && targetDistance >= rangeRanged)){ //not in range
 
+            rb.velocity = targetDir * speed;
+        }
+        else if(!meleeEnabled && rangedEnabled && targetDistance < rangeRanged){ //flee when only ranged
+            rb.velocity = (-targetDir) * speed;
+        }
+        else if(!meleeEnabled && !rangedEnabled && targetDistance > 0.5){ //only move
             rb.velocity = targetDir * speed;
         }
         else
         { rb.velocity = Vector3.zero; }
     }
-    private void Attack(float targetDistance, Vector3 targetPos, GameManager.EntityClass sender){
 
-        if(targetDistance <= range){
+    private void Explode(){
 
-            attackEnd = Time.time + stats.attackTime;
-            attacking = true;
-            nextAttackTime = Time.time + stats.attackSpeed;
-            Vector3 spawnPos = gameObject.transform.position;
-            Vector3 targetDir = (targetPos - new Vector3(gameObject.transform.position.x + attackOffsetPoint.x, gameObject.transform.position.y + attackOffsetPoint.y, 0)).normalized;
-
-
-            spawnPos.x += targetDir.x * attackOffset+ attackOffsetPoint.x;
-            spawnPos.y += targetDir.y * attackOffset + attackOffsetPoint.y;
-            
-            float angle = Mathf.Atan2(targetDir.y, targetDir.x) * Mathf.Rad2Deg;
-            Quaternion rotation = Quaternion.Euler(0f, 0f, angle);
-            GameObject attack = Instantiate(attackPf, spawnPos, rotation);
-            attack.GetComponent<Attack>().Setup(targetDir, sender);
-            
+        if(targetDistance < 1){
+            for(int i =0; i < explodeAmount; i++){
+                Attack(explodeAttackPf);
+            }
         }
+    }
+    private void Attack(GameObject attackPf){
+        if(!attackPf) return;
+        
+        Vector3 spawnPos = gameObject.transform.position;
+
+        spawnPos.x += targetDir.x * attackOffset+ attackOffsetPoint.x;
+        spawnPos.y += targetDir.y * attackOffset + attackOffsetPoint.y;
+        
+        float angle = Mathf.Atan2(targetDir.y, targetDir.x) * Mathf.Rad2Deg;
+        Quaternion rotation = Quaternion.Euler(0f, 0f, angle);
+        GameObject attack = Instantiate(attackPf, spawnPos, rotation);
+        attack.GetComponent<Attack>().Setup(targetDir, GameManager.EntityClass.Player);
+        
+        
     }
 
     private void FlipEntity(float dirx, bool mirrorFLip){
