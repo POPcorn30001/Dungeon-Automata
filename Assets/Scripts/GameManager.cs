@@ -191,10 +191,8 @@ public class GameManager : MonoBehaviour
         if(targetType == EntityClass.Enemy){
             enemiesLeft--;
             UpdateEnemies(enemiesLeft);
-            if(Random.Range(0,5) == 1){
-                parts ++;
-                playerPanel.SetParts(parts);
-            }
+            parts ++;
+            playerPanel.SetParts(parts);
         }
     }
 
@@ -284,7 +282,7 @@ public class GameManager : MonoBehaviour
     }
 
     private void FollowPlayer(){ //becouse of button play sound
-        gameObject.transform.position = player.transform.position;
+       if(player) gameObject.transform.position = player.transform.position;
     }
 
     public void ChangeVolume(float value){

@@ -36,6 +36,7 @@ public class ModuleItem : MonoBehaviour
 
     public void RemoveSelfFromList(){
         TinkerPanel.Instance.RemoveFromList(type);
+        GameManager.Instance.audioSource.Play();
         Destroy(gameObject);
     }
 }

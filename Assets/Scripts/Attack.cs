@@ -8,6 +8,9 @@ public class Attack : MonoBehaviour
     private GameManager.EntityClass entityClass = GameManager.EntityClass.Player;
     private Rigidbody2D rb;
     private List<GameObject> targetsHit = new List<GameObject>();
+    private bool dmgDone = false;
+    [SerializeField] private AudioSource audioSource;
+    
     
     [SerializeField] private AttackObject stats;
     public float speed = 1;
@@ -66,11 +69,16 @@ public class Attack : MonoBehaviour
             if(!targetsHit.Contains(collider.gameObject) ){
                 health.TakeDamage(damage);
                 targetsHit.Add(collider.gameObject);
+                if(audioSource && !dmgDone) audioSource.Play();
+                dmgDone = true;
             } 
         }
 
         //hit obstacle
 
-        if(!AOE) Destroy(gameObject);
+        if(!AOE){
+            if(audioSource) Destroy(gameObject, audioSource.clip.length);
+            else Destroy(gameObject);
+        } 
     }
 }

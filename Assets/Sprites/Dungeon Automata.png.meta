@@ -362,27 +362,6 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Dungeon Automata_14
-      rect:
-        serializedVersion: 2
-        x: 919
-        y: 446
-        width: 142
-        height: 206
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: a1e41937edefc384da7bfe680b3bdf7c
-      internalID: 1921514445
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
       name: Box
       rect:
         serializedVersion: 2
@@ -487,6 +466,27 @@ TextureImporter:
       indices: 
       edges: []
       weights: []
+    - serializedVersion: 2
+      name: Wooden fist attack
+      rect:
+        serializedVersion: 2
+        x: 860
+        y: 1076
+        width: 95
+        height: 131
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 670367cd580cb044282d09ea1078466c
+      internalID: 1617855384
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
     outline: []
     physicsShape: []
     bones: []
@@ -514,6 +514,7 @@ TextureImporter:
       Parts Icon: -6435075
       Slash: -1426932186
       Turret: 48961330
+      Wooden fist attack: 1617855384
       Wrench: 861825949
       Zombie: 98988739
   mipmapLimitGroupName: 

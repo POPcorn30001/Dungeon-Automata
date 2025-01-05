@@ -12,6 +12,7 @@ public class Health : MonoBehaviour
     private int maxHealth;
 
     public bool isPlayer = false;
+    [SerializeField] private AudioSource audioSource;
     
     
     void Awake()
@@ -34,7 +35,7 @@ public class Health : MonoBehaviour
     }
 
     public void TakeDamage(int val){
-
+        if(isPlayer && audioSource) audioSource.Play();
         health -= val;
         if(health <= 0){
             health = 0;
@@ -48,9 +49,14 @@ public class Health : MonoBehaviour
         GameManager.Instance.RemoveEntityFromList(target, entityClass);
         
         if(isPlayer){
+            if(audioSource) audioSource.Play();
             GameManager.Instance.EndGame();
+            Destroy(gameObject, audioSource.clip.length);
         }
-        Destroy(gameObject);
+        else{
+            Destroy(gameObject);
+        }
+        
     }
 
     public void Heal(int val){

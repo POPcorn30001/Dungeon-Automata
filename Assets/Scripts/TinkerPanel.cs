@@ -35,27 +35,45 @@ public class TinkerPanel : MonoBehaviour
     public void AddToList(int num){
         
         RobotBox.Components module = (RobotBox.Components)num;
-        parts.Add(module);
-
-        GameObject item = Instantiate(listItemPF, list.transform);
-        item.GetComponent<ModuleItem>().SetComponentType(module);
         switch (module){
 
             case RobotBox.Components.Melee:
                 cost += 1;
+                if(cost > GameManager.Instance.parts){
+                    cost -=1;
+                    return;
+                }
                 break;
             case RobotBox.Components.Shoot:
                 cost += 2;
+                if(cost > GameManager.Instance.parts){
+                    cost -=2;
+                    return;
+                }
                 break;
             case RobotBox.Components.Move:
                 cost += 1;
+                if(cost > GameManager.Instance.parts){
+                    cost -=1;
+                    return;
+                }
                 break;
             case RobotBox.Components.Explode:
                 cost += 2;
+                if(cost > GameManager.Instance.parts){
+                    cost -=2;
+                    return;
+                }
                 break;
             default:
                 break;
         }
+
+        parts.Add(module);
+
+        GameObject item = Instantiate(listItemPF, list.transform);
+        item.GetComponent<ModuleItem>().SetComponentType(module);
+        
 
         costText.text = "Cost:  "+cost;
     }

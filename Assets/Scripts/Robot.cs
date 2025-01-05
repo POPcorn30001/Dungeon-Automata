@@ -6,6 +6,7 @@ using UnityEngine;
 
 public class Robot : MonoBehaviour
 {
+    [SerializeField] private AudioSource audioSource;
     public GameManager.EntityClass entityClass = GameManager.EntityClass.Player;
     public bool Flip = false;
     private Rigidbody2D rb;
@@ -56,11 +57,11 @@ public class Robot : MonoBehaviour
         sr = gameObject.GetComponent<SpriteRenderer>();
         
 
-        sr.sortingOrder = Mathf.RoundToInt(-transform.position.y * 100);
+        
     }
 
     void Update(){
-        
+        sr.sortingOrder = Mathf.RoundToInt(-transform.position.y * 100);
         if(!setUpDone) return;
 
         currentTarget = GameManager.Instance.NearestEntity(GameManager.EntityClass.Enemy,gameObject.transform.position);
@@ -135,6 +136,7 @@ public class Robot : MonoBehaviour
     private void Ranged(){
 
         if(nextAttackRanged > Time.time || targetDistance > rangeRanged) return;
+        if(audioSource) audioSource.Play();
         nextAttackRanged = Time.time + rangedAttackSpeed;
         Attack(rangedAttackPf, false);
     }
